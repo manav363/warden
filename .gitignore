@@ -21,3 +21,5 @@ scan-output/
 *.evidence.json
 # OS
 .DS_Store
+# Claude Code (settings.json is shared and committed; local overrides are not)
+.claude/settings.local.json
