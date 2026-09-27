@@ -55,8 +55,19 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  compose:
+  discovery-integration:
+    # Scans only the compose stack on 127.0.0.1 (see sensor/discovery/tests/compose_scan.rs).
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - run: docker compose -f deploy/docker-compose.yml config -q
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: sensor/discovery
+      - run: docker compose -f deploy/docker-compose.yml up -d --build --wait
+      - run: cargo test --locked --test compose_scan -- --ignored
+        working-directory: sensor/discovery
+      - if: failure()
+        run: docker compose -f deploy/docker-compose.yml logs
+      - if: always()
+        run: docker compose -f deploy/docker-compose.yml down -v
