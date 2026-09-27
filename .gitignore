@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+# Rust
+target/
+# Node
+node_modules/
+dist/
+# Env / secrets
+.env
+*.pem
+*.key
+secrets/
+# Scan output (may contain sensitive host data)
+scan-output/
+*.evidence.json
+# OS
+.DS_Store
