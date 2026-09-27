@@ -3,11 +3,11 @@
 Tick items as they land. One milestone per Claude Code session: plan → build → test → commit.
 
 ## M0 — Foundation
-- [ ] `deploy/docker-compose.yml`: Postgres, Redis, NATS (JetStream), MinIO, Vault (dev)
-- [ ] `services/api`: uv project, FastAPI `/health`, config, structured logging, OTel hook
-- [ ] `sensor/discovery`: Rust crate skeleton + CLI
-- [ ] `.github/workflows/ci.yml`: ruff, mypy, pytest, clippy, cargo test, gitleaks
-- [ ] ADR 0001 (NATS over Celery), ADR 0002 (Rust discovery / Python collectors)
+- [x] `deploy/docker-compose.yml`: Postgres, Redis, NATS (JetStream), MinIO (Chainguard, see ADR 0003), Vault (dev)
+- [x] `services/api`: uv project, FastAPI `/health`, config, structured logging, OTel hook
+- [x] `sensor/discovery`: Rust crate skeleton + CLI
+- [x] `.github/workflows/ci.yml`: ruff, mypy, pytest, clippy, cargo test, gitleaks
+- [x] ADR 0001 (NATS over Celery), ADR 0002 (Rust discovery / Python collectors), ADR 0003 (object storage — Proposed)
 
 ## M1 — Discovery
 - [ ] Rust async TCP connect scan + rate limiter + banner grab + JSON output

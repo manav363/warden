@@ -30,6 +30,9 @@ Flagship project. Remotely inspects Windows machines and networks **without inst
 - Structured JSON logging everywhere; include `scan_id`, `host_id`, `stage`, trace ids.
 - Config via env vars prefixed `WARDEN_` (see `.env.example`).
 - Tests next to the code they cover; recorded lab fact snapshots go in `services/correlation/tests/fixtures/`.
+- Compose publishes ports on `127.0.0.1` only. Postgres/Redis host ports are overridable (`WARDEN_PG_PORT`, `WARDEN_REDIS_PORT`) for machines that run them natively.
+- Talk to object storage via the S3 API only (no MinIO-specific calls); see ADR 0003.
+- JSON logging/OTel helpers live in `services/api/app/observability.py` until a second service needs them, then move to `packages/py-common`.
 
 ## Workflow
 - Work **one milestone at a time** (see `docs/architecture.md` §9 and `docs/ROADMAP.md`). Plan first, then implement.
