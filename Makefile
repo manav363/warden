@@ -19,5 +19,5 @@ discovery-test:
 	cd sensor/discovery && cargo test
 
 lint:
-	cd services/api && uv run ruff check . && uv run mypy app
-	cd sensor/discovery && cargo clippy -- -D warnings
+	cd services/api && uv run ruff check . && uv run ruff format --check . && uv run mypy app
+	cd sensor/discovery && cargo clippy --all-targets -- -D warnings
