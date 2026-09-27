@@ -1,0 +1,131 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://warden.local/schemas/jobs/discover_result.schema.json",
+  "title": "DiscoverResult",
+  "description": "Facts produced by a discover job. Raw observations only; no judgments (expiry, weakness, trust) — those belong to correlation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version", "scan_id", "scope_id", "stage", "sensor", "status", "stopped_reason",
+    "started_at", "finished_at", "stats", "hosts"
+  ],
+  "properties": {
+    "version": { "const": 1 },
+    "scan_id": { "type": "string", "format": "uuid" },
+    "scope_id": { "type": "string", "format": "uuid" },
+    "stage": { "const": "discover" },
+    "sensor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version"],
+      "properties": {
+        "name": { "type": "string" },
+        "version": { "type": "string" }
+      }
+    },
+    "status": { "enum": ["complete", "partial"] },
+    "stopped_reason": {
+      "description": "Why a partial scan stopped; null when complete.",
+      "enum": ["scope_expired", "cancelled", "error", null]
+    },
+    "started_at": { "type": "string", "format": "date-time" },
+    "finished_at": { "type": "string", "format": "date-time" },
+    "stats": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "hosts_targeted", "ports_per_host", "connections_attempted",
+        "open_ports", "closed", "filtered", "unreachable", "other_errors"
+      ],
+      "properties": {
+        "hosts_targeted": { "$ref": "#/$defs/count" },
+        "ports_per_host": { "$ref": "#/$defs/count" },
+        "connections_attempted": { "$ref": "#/$defs/count" },
+        "open_ports": { "$ref": "#/$defs/count" },
+        "closed": { "$ref": "#/$defs/count" },
+        "filtered": { "$ref": "#/$defs/count" },
+        "unreachable": { "$ref": "#/$defs/count" },
+        "other_errors": { "$ref": "#/$defs/count" }
+      }
+    },
+    "hosts": {
+      "description": "Hosts with at least one open port, sorted by IP.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/host" }
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "status": { "const": "complete" } } },
+      "then": { "properties": { "stopped_reason": { "const": null } } },
+      "else": { "properties": { "stopped_reason": { "enum": ["scope_expired", "cancelled", "error"] } } }
+    }
+  ],
+  "$defs": {
+    "count": { "type": "integer", "minimum": 0 },
+    "host": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ip", "ports"],
+      "properties": {
+        "ip": { "type": "string", "oneOf": [{ "format": "ipv4" }, { "format": "ipv6" }] },
+        "ports": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/port" } }
+      }
+    },
+    "port": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["port", "proto", "state", "banner", "tls"],
+      "properties": {
+        "port": { "type": "integer", "minimum": 1, "maximum": 65535 },
+        "proto": { "const": "tcp" },
+        "state": { "const": "open" },
+        "banner": {
+          "oneOf": [
+            { "type": "null" },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["probe", "text"],
+              "properties": {
+                "probe": { "enum": ["passive", "http", "https"] },
+                "text": { "type": "string", "description": "First <=1024 bytes received, lossy UTF-8." }
+              }
+            }
+          ]
+        },
+        "tls": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/tls" }] }
+      }
+    },
+    "tls": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "cipher_suite", "cert", "chain_length"],
+      "properties": {
+        "version": { "type": "string" },
+        "cipher_suite": { "type": "string" },
+        "chain_length": { "type": "integer", "minimum": 1 },
+        "cert": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "subject", "issuer", "serial", "sans", "not_before", "not_after",
+            "signature_algorithm", "public_key_algorithm", "public_key_bits", "sha256"
+          ],
+          "properties": {
+            "subject": { "type": "string" },
+            "issuer": { "type": "string" },
+            "serial": { "type": "string" },
+            "sans": { "type": "array", "items": { "type": "string" } },
+            "not_before": { "type": "string", "format": "date-time" },
+            "not_after": { "type": "string", "format": "date-time" },
+            "signature_algorithm": { "type": "string" },
+            "public_key_algorithm": { "type": "string" },
+            "public_key_bits": { "type": ["integer", "null"], "minimum": 0 },
+            "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+          }
+        }
+      }
+    }
+  }
+}
