@@ -1,0 +1,13 @@
+[package]
+name = "warden-discovery"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+description = "Warden sensor discovery engine"
+publish = false
+
+[dependencies]
+clap = { version = "4.6.7", features = ["derive", "env"] }
+tokio = { version = "1.53.1", features = ["rt-multi-thread", "macros"] }
+tracing = "0.1.44"
+tracing-subscriber = { version = "0.3.23", features = ["json", "env-filter"] }
