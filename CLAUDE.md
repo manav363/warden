@@ -32,6 +32,9 @@ Flagship project. Remotely inspects Windows machines and networks **without inst
 - Tests next to the code they cover; recorded lab fact snapshots go in `services/correlation/tests/fixtures/`.
 - Compose publishes ports on `127.0.0.1` only. Postgres/Redis host ports are overridable (`WARDEN_PG_PORT`, `WARDEN_REDIS_PORT`) for machines that run them natively.
 - Talk to object storage via the S3 API only (no MinIO-specific calls); see ADR 0003.
+- Sensor egress: every outbound socket goes through `guard::connect` in `sensor/discovery` (enforced by `clippy.toml` `disallowed-methods`). Targets are IP/CIDR literals only, with no DNS.
+- **No HTTP or network client crates (reqwest, hyper client, ureq, …) in the sensor without an ADR.** Clippy can't see sockets opened inside dependencies.
+- Discovery exit codes: 0 complete, 1 runtime error, 2 job rejected (nothing sent), 3 partial.
 - JSON logging/OTel helpers live in `services/api/app/observability.py` until a second service needs them, then move to `packages/py-common`.
 
 ## Workflow

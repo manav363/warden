@@ -10,10 +10,21 @@ Tick items as they land. One milestone per Claude Code session: plan → build �
 - [x] ADR 0001 (NATS over Celery), ADR 0002 (Rust discovery / Python collectors), ADR 0003 (object storage — Proposed)
 
 ## M1 — Discovery
-- [ ] Rust async TCP connect scan + rate limiter + banner grab + JSON output
-- [ ] Scope guard (CIDR allowlist + expiry) in API and sensor
+### M1a — Contracts + sensor scan
+- [x] `packages/schemas/jobs/`: `discover_job` / `discover_result` JSON Schemas (format validation on)
+- [x] Sensor scope guard: sole egress point, fail-closed, per-connection expiry, clippy-enforced
+- [x] `warden-discovery scan`: rate-limited connect scan, banner grab, TLS cert summary, partial results
+- [x] Hermetic tests + compose integration test (CI job `discovery-integration`)
+
+### M1b — Job transport (NATS)
+- [ ] Orchestrator publishes discover jobs; sensor pulls, acks, publishes results; DLQ
+
+### M1c — Persistence + API
 - [ ] API models: scopes, scans, scan_jobs, assets, services (Alembic)
-- [ ] Orchestrator: scan → discover job over NATS → results → assets
+- [ ] API-side scope guard; `POST /scans` → 202
+- [ ] Discover results → assets/services
+
+### M1d — Dashboard
 - [ ] Minimal dashboard: scopes, scans, assets
 
 ## M2 — Windows collection
