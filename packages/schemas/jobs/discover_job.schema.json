@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://warden.local/schemas/jobs/discover_job.schema.json",
+  "title": "DiscoverJob",
+  "description": "Host/port discovery job sent to a sensor. The sensor re-validates every target against `scope` before sending a packet.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "scan_id", "targets", "ports", "scope"],
+  "properties": {
+    "version": { "const": 1 },
+    "scan_id": { "type": "string", "format": "uuid" },
+    "targets": {
+      "description": "IP or CIDR literals. Hostnames are not allowed: DNS resolution could escape the scope.",
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1024,
+      "items": { "$ref": "#/$defs/ip_or_cidr" }
+    },
+    "ports": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 65535,
+      "uniqueItems": true,
+      "items": { "type": "integer", "minimum": 1, "maximum": 65535 }
+    },
+    "scope": {
+      "description": "Authorized scope. Required: no scope, no scan.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scope_id", "cidrs", "expires_at"],
+      "properties": {
+        "scope_id": { "type": "string", "format": "uuid" },
+        "cidrs": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1024,
+          "items": { "$ref": "#/$defs/ip_or_cidr" }
+        },
+        "expires_at": {
+          "description": "RFC 3339 timestamp; exclusive. No connection is made at or after this instant.",
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "default": {},
+      "properties": {
+        "max_concurrency": { "type": "integer", "minimum": 1, "maximum": 256, "default": 16 },
+        "max_rate_per_sec": {
+          "description": "Connection attempts per second across the whole job (every probe connection counts).",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000,
+          "default": 50
+        },
+        "connect_timeout_ms": { "type": "integer", "minimum": 100, "maximum": 10000, "default": 1500 },
+        "banner_timeout_ms": { "type": "integer", "minimum": 100, "maximum": 10000, "default": 2000 }
+      }
+    }
+  },
+  "$defs": {
+    "ip_or_cidr": {
+      "description": "Syntactic pre-filter only; the sensor parses strictly and fails closed.",
+      "type": "string",
+      "maxLength": 64,
+      "pattern": "^[0-9A-Fa-f:.]+(/[0-9]{1,3})?$"
+    }
+  }
+}

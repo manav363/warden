@@ -1,6 +1,6 @@
 [package]
 name = "warden-discovery"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2024"
 rust-version = "1.85"
 description = "Warden sensor discovery engine"
@@ -8,6 +8,21 @@ publish = false
 
 [dependencies]
 clap = { version = "4.6.7", features = ["derive", "env"] }
-tokio = { version = "1.53.1", features = ["rt-multi-thread", "macros"] }
+ipnet = { version = "2.12.2", features = ["serde"] }
+jsonschema = { version = "0.58.1", default-features = false }
+libc = "0.2.189"
+rustls = { version = "0.23.45", default-features = false, features = ["ring", "std", "tls12"] }
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.151"
+sha2 = "0.11.0"
+time = { version = "0.3.45", features = ["serde", "parsing", "formatting", "macros"] }
+tokio = { version = "1.53.1", features = ["rt-multi-thread", "macros", "net", "time", "sync", "io-util", "signal"] }
+tokio-rustls = { version = "0.26.5", default-features = false, features = ["ring", "tls12"] }
 tracing = "0.1.44"
 tracing-subscriber = { version = "0.3.23", features = ["json", "env-filter"] }
+x509-parser = "0.18.1"
+
+[dev-dependencies]
+proptest = "1.11.0"
+rcgen = "0.14.7"
+tokio = { version = "1.53.1", features = ["test-util"] }

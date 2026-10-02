@@ -1,0 +1,14 @@
+# Egress rule: every outbound socket and every DNS lookup must go through
+# guard::connect (scope-checked). CI runs clippy with -D warnings, so any other
+# use is a build failure. Dependencies are invisible to clippy: see CLAUDE.md
+# (no network/HTTP client crates in the sensor without an ADR).
+disallowed-methods = [
+  { path = "tokio::net::TcpStream::connect", reason = "use guard::connect (scope guard)" },
+  { path = "tokio::net::TcpSocket::connect", reason = "use guard::connect (scope guard)" },
+  { path = "std::net::TcpStream::connect", reason = "use guard::connect (scope guard)" },
+  { path = "std::net::TcpStream::connect_timeout", reason = "use guard::connect (scope guard)" },
+  { path = "tokio::net::UdpSocket::bind", reason = "no UDP egress without a scope-guarded path" },
+  { path = "std::net::UdpSocket::bind", reason = "no UDP egress without a scope-guarded path" },
+  { path = "tokio::net::lookup_host", reason = "no DNS: targets are IP/CIDR literals only" },
+  { path = "std::net::ToSocketAddrs::to_socket_addrs", reason = "no DNS: targets are IP/CIDR literals only" },
+]
