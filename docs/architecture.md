@@ -1,6 +1,6 @@
 # Warden — System Architecture
 
-> Agentless Vulnerability & Network Scanner. Built on the reference shapes in the Obsidian notes *Backend Architecture* (edge → gateway → stateless services → data → async; sync vs async decided per side-effect), *Frontend Architecture* (per-route rendering, server state ≠ client state), and *DevOps Architecture* (GitOps, rollback = git revert, observability from deploy #1).
+> Agentless Vulnerability & Network Scanner. Built on a standard layered shape: edge → gateway → stateless services → data → async, with sync vs async decided per side-effect; per-route rendering and server state kept separate from client state on the frontend; GitOps with rollback as `git revert` and observability from the first deploy.
 
 ## 1. Design principles
 
